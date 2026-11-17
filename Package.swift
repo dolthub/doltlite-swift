@@ -21,8 +21,8 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "CDoltlite",
-            url: "https://github.com/dolthub/doltlite/releases/download/v0.51.12/doltlite-0.51.12.xcframework.zip",
-            checksum: "3f0e794cc489287ce535d8a84bdd56e7bb587578c34a96ba6be7f3b31f612d05"
+            url: "https://github.com/dolthub/doltlite/releases/download/v0.51.13/doltlite-0.51.13.xcframework.zip",
+            checksum: "5785a9cb8ca4bc22f7af3f3f61272b92e1e4496334428bc0bce6e67c9395745a"
         ),
         .target(
             name: "Doltlite",
