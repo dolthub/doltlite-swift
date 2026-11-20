@@ -61,11 +61,21 @@ public final class Doltlite {
             let message = handle.flatMap { String(cString: sqlite3_errmsg($0)) } ?? "unknown error"
             throw Error.prepare(message: message)
         }
+        guard let statement else { return [] }
         defer { sqlite3_finalize(statement) }
 
         var rows: [[String?]] = []
         let columnCount = sqlite3_column_count(statement)
-        while sqlite3_step(statement) == SQLITE_ROW {
+        while true {
+            switch sqlite3_step(statement) {
+            case SQLITE_DONE:
+                return rows
+            case SQLITE_ROW:
+                break
+            default:
+                let message = handle.flatMap { String(cString: sqlite3_errmsg($0)) } ?? "unknown error"
+                throw Error.exec(message: message)
+            }
             var row: [String?] = []
             for column in 0..<columnCount {
                 if let text = sqlite3_column_text(statement, column) {
@@ -76,7 +86,6 @@ public final class Doltlite {
             }
             rows.append(row)
         }
-        return rows
     }
 
     /// Convenience for `SELECT dolt_commit(...)`. Stages all changes when
