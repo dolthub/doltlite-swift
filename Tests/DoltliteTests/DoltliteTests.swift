@@ -18,4 +18,18 @@ final class DoltliteTests: XCTestCase {
         let count = try db.query("SELECT count(*) FROM dolt_log").first?.first ?? nil
         XCTAssertEqual(count, "2")
     }
+
+    func testQueryThrowsAfterReadingARow() throws {
+        let db = try Doltlite(":memory:")
+
+        XCTAssertThrowsError(try db.query("SELECT 1 UNION ALL SELECT json_extract('invalid', '$')")) { error in
+            guard case Doltlite.Error.exec(let message) = error else {
+                return XCTFail("Expected an execution error, got \(error)")
+            }
+            XCTAssertEqual(message, "malformed JSON")
+        }
+        XCTAssertEqual(try db.query("SELECT 1 WHERE 0"), [])
+        XCTAssertEqual(try db.query("-- no statement"), [])
+        XCTAssertEqual(try db.query("SELECT 1, NULL"), [["1", nil]])
+    }
 }
